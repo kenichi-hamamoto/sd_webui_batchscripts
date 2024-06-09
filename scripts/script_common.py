@@ -2,22 +2,22 @@ import gradio as gr
 import modules.scripts as scripts
 
 arg_mapping = {
-    'Prompt': 'prompt',
-    'Negative prompt': 'negative_prompt',
-    'Steps': 'steps',
-    'Sampler': 'sampler_name',
-    'CFG scale': 'cfg_scale',
-    'Seed': 'seed',
-    'Size-1': 'width',
-    'Size-2': 'height',
-    'Model hash': 'sd_model_hash',  # goes to override
-    'Clip skip': 'CLIP_stop_at_last_layers',  # goes to override instead of using clip_skip
-    'Denoising strength': 'denoising_strength',
-    'Hires upscale': 'hr_scale',
-    'Hires upscaler': 'hr_upscaler',
-    'Hires resize-1': 'hr_resize_x',
-    'Hires resize-2': 'hr_resize_y',
-    'Hires steps': 'hr_second_pass_steps',
+    "Prompt": "prompt",
+    "Negative prompt": "negative_prompt",
+    "Steps": "steps",
+    "Sampler": "sampler_name",
+    "CFG scale": "cfg_scale",
+    "Seed": "seed",
+    "Size-1": "width",
+    "Size-2": "height",
+    "Model hash": "sd_model_hash",  # goes to override
+    "Clip skip": "CLIP_stop_at_last_layers",  # goes to override instead of using clip_skip
+    "Denoising strength": "denoising_strength",
+    "Hires upscale": "hr_scale",
+    "Hires upscaler": "hr_upscaler",
+    "Hires resize-1": "hr_resize_x",
+    "Hires resize-2": "hr_resize_y",
+    "Hires steps": "hr_second_pass_steps",
     # 'First pass size-1': 'skip-1',
     # 'First pass size-2': 'skip-2',
     # 'Model': 'skip-3',
@@ -31,27 +31,27 @@ arg_mapping = {
     # 'Aesthetic embedding': 'skip-11',
     # 'Aesthetic slerp angle': 'skip-12',
     # 'Aesthetic text negative': 'skip-13',
-    'Conditional mask weight': 'inpainting_mask_weight',  # goes to override
-    'ENSD': 'eta_noise_seed_delta',  # goes to override
-    'Noise multiplier': 'initial_noise_multiplier',  # goes to override
-    'Eta': 'eta_ancestral',  # goes to override instead of using 'eta'
-    'Eta DDIM': 'eta_ddim',  # goes to override
-    'Discard penultimate sigma': 'always_discard_next_to_last_sigma',  # goes to override
-    'Variation seed': 'subseed',
-    'Variation seed strength': 'subseed_strength',
-    'Face restoration': 'face_restoration_model',
-    'Mask blur': 'mask_blur',
-    'Seed resize from': 'seed_resize'
+    "Conditional mask weight": "inpainting_mask_weight",  # goes to override
+    "ENSD": "eta_noise_seed_delta",  # goes to override
+    "Noise multiplier": "initial_noise_multiplier",  # goes to override
+    "Eta": "eta_ancestral",  # goes to override instead of using 'eta'
+    "Eta DDIM": "eta_ddim",  # goes to override
+    "Discard penultimate sigma": "always_discard_next_to_last_sigma",  # goes to override
+    "Variation seed": "subseed",
+    "Variation seed strength": "subseed_strength",
+    "Face restoration": "face_restoration_model",
+    "Mask blur": "mask_blur",
+    "Seed resize from": "seed_resize",
 }
 
 override_list = [
-    'CLIP_stop_at_last_layers',
-    'inpainting_mask_weight',
-    'eta_noise_seed_delta',
-    'initial_noise_multiplier',
-    'eta_ancestral',
-    'eta_ddim',
-    'always_discard_next_to_last_sigma'
+    "CLIP_stop_at_last_layers",
+    "inpainting_mask_weight",
+    "eta_noise_seed_delta",
+    "initial_noise_multiplier",
+    "eta_ancestral",
+    "eta_ddim",
+    "always_discard_next_to_last_sigma",
 ]
 
 
@@ -72,7 +72,7 @@ def process_boolean_tag(tag):
 
 
 def process_seedresize_tag(tag):
-    sp = tag.split('x')
+    sp = tag.split("x")
     return (int(sp[0]), int(sp[1]))
 
 
@@ -116,7 +116,7 @@ prompt_tags = {
     "denoising_strength": process_float_tag,
     "face_restoration_model": process_string_tag,
     "mask_blur": process_int_tag,
-    "seed_resize": process_seedresize_tag
+    "seed_resize": process_seedresize_tag,
 }
 
 overrides_mapping = {
@@ -126,7 +126,7 @@ overrides_mapping = {
     "Override CFG Scale": "cfg_scale",
     "Override Sampler": "sampler_name",
     "Override Width": "width",
-    "Override Height": "height"
+    "Override Height": "height",
 }
 possible_overrides = list(overrides_mapping.keys())
 default_overrides = ["Override Model"]
@@ -136,25 +136,45 @@ def load_prompt_file(file):
     if file is None:
         return None, gr.update(), gr.update(lines=7)
     else:
-        lines = [x.strip() for x in file.decode('utf8', errors='ignore').split("\n")]
+        lines = [x.strip() for x in file.decode("utf8", errors="ignore").split("\n")]
         return None, "\n".join(lines), gr.update(lines=7)
 
 
 def ui(script: scripts.Script):
-    script_overrides = gr.CheckboxGroup(label="Overrides", choices=possible_overrides, value=default_overrides)
+    script_overrides = gr.CheckboxGroup(
+        label="Overrides", choices=possible_overrides, value=default_overrides
+    )
     with gr.Accordion(label="Prompt overrides", open=False):
-        prepend_prompt_text = gr.Textbox(label="Text to prepend", lines=1,
-                                         elem_id=script.elem_id("prepend_prompt_text"))
-        append_prompt = gr.Checkbox(label="Append text instead", elem_id=script.elem_id("append_prompt"))
+        prepend_prompt_text = gr.Textbox(
+            label="Text to prepend",
+            lines=1,
+            elem_id=script.elem_id("prepend_prompt_text"),
+        )
+        append_prompt = gr.Checkbox(
+            label="Append text instead", elem_id=script.elem_id("append_prompt")
+        )
 
-    prompt_txt = gr.Textbox(label="List of prompt inputs", lines=1, elem_id=script.elem_id("prompt_txt"))
-    file = gr.File(label="Upload prompt inputs", type='binary', elem_id=script.elem_id("file"))
+    prompt_txt = gr.Textbox(
+        label="List of prompt inputs", lines=1, elem_id=script.elem_id("prompt_txt")
+    )
+    file = gr.File(
+        label="Upload prompt inputs", type="binary", elem_id=script.elem_id("file")
+    )
 
-    file.change(fn=load_prompt_file, inputs=[file], outputs=[file, prompt_txt, prompt_txt], show_progress=False)
+    file.change(
+        fn=load_prompt_file,
+        inputs=[file],
+        outputs=[file, prompt_txt, prompt_txt],
+        show_progress=False,
+    )
 
     # We start at one line. When the text changes, we jump to seven lines, or two lines if no \n.
     # We don't shrink back to 1, because that causes the control to ignore [enter], and it may
     # be unclear to the user that shift-enter is needed.
-    prompt_txt.change(lambda tb: gr.update(lines=7) if ("\n" in tb) else gr.update(lines=2), inputs=[prompt_txt],
-                      outputs=[prompt_txt], show_progress=False)
+    prompt_txt.change(
+        lambda tb: gr.update(lines=7) if ("\n" in tb) else gr.update(lines=2),
+        inputs=[prompt_txt],
+        outputs=[prompt_txt],
+        show_progress=False,
+    )
     return [prepend_prompt_text, append_prompt, prompt_txt, script_overrides]

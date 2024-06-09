@@ -10,7 +10,6 @@ from modules.processing import process_images
 from modules.shared import state
 
 
-
 class Script(scripts.Script):
 
     # The title of the script. This is what will be displayed in the dropdown menu.
@@ -42,7 +41,14 @@ class Script(scripts.Script):
     # to be used in processing. The return value should be a Processed object, which is
     # what is returned by the process_images method.
 
-    def run(self, p, prepend_prompt_text: str, append_prompt: bool, prompt_txt: str, script_overrides: list[str]):
+    def run(
+        self,
+        p,
+        prepend_prompt_text: str,
+        append_prompt: bool,
+        prompt_txt: str,
+        script_overrides: list[str],
+    ):
 
         import modules.images as img
         import modules.generation_parameters_copypaste as gpc
@@ -50,7 +56,11 @@ class Script(scripts.Script):
 
         def update_dict_keys(obj, mapping_dict):
             if isinstance(obj, dict):
-                return {mapping_dict[k]: update_dict_keys(v, mapping_dict) for k, v in obj.items() if mapping_dict.get(k)}
+                return {
+                    mapping_dict[k]: update_dict_keys(v, mapping_dict)
+                    for k, v in obj.items()
+                    if mapping_dict.get(k)
+                }
             else:
                 return obj
 
@@ -90,23 +100,26 @@ class Script(scripts.Script):
 
                     for arg, val in args.items():
                         func = sc.prompt_tags.get(arg, None)
-                        assert func, f'unknown file setting: {arg}'
+                        assert func, f"unknown file setting: {arg}"
                         formated_args[arg] = func(val)
 
-                    if (formated_args.get('hr_scale', 0) > 0) or (formated_args.get('hr_resize_x', 0) > 0) or (
-                            formated_args.get('hr_resize_y', 0) > 0):
-                        formated_args['enable_hr'] = True
+                    if (
+                        (formated_args.get("hr_scale", 0) > 0)
+                        or (formated_args.get("hr_resize_x", 0) > 0)
+                        or (formated_args.get("hr_resize_y", 0) > 0)
+                    ):
+                        formated_args["enable_hr"] = True
                     else:
-                        formated_args['enable_hr'] = False
+                        formated_args["enable_hr"] = False
 
-                    if formated_args.get('face_restoration_model', False):
-                        formated_args['restore_faces'] = True
+                    if formated_args.get("face_restoration_model", False):
+                        formated_args["restore_faces"] = True
 
-                        seed_resize = formated_args.get('seed_resize', None)
+                        seed_resize = formated_args.get("seed_resize", None)
                         if seed_resize:
-                            formated_args['seed_resize_from_w'] = seed_resize[0]
-                            formated_args['seed_resize_from_h'] = seed_resize[1]
-                            formated_args.pop('restore_faces', None)
+                            formated_args["seed_resize_from_w"] = seed_resize[0]
+                            formated_args["seed_resize_from_h"] = seed_resize[1]
+                            formated_args.pop("restore_faces", None)
 
                     override_settings = {}
 
@@ -114,13 +127,17 @@ class Script(scripts.Script):
                         value = formated_args.pop(setting_name, None)
                         if value is None:
                             continue
-                        override_settings[setting_name] = shared.opts.cast_value(setting_name, value)
+                        override_settings[setting_name] = shared.opts.cast_value(
+                            setting_name, value
+                        )
 
                     job_count += formated_args.get("n_iter", p.n_iter)
                     jobs.append(formated_args)
                     overrides.append(override_settings)
 
-        print(f"Read {len(lines)} lines, will process {len(jobs)} jobs generating {job_count} images.")
+        print(
+            f"Read {len(lines)} lines, will process {len(jobs)} jobs generating {job_count} images."
+        )
 
         images = []
         all_prompts = []
@@ -144,15 +161,17 @@ class Script(scripts.Script):
                 all_prompts += proc.all_prompts
                 infotexts += proc.infotexts
 
-        models_to_use = {j.get('sd_model_hash') for j in jobs}
+        models_to_use = {j.get("sd_model_hash") for j in jobs}
         runs_list = {}
         for model in models_to_use:
-            runs_list[model] = [j for j in jobs if j.get('sd_model_hash') == model]
+            runs_list[model] = [j for j in jobs if j.get("sd_model_hash") == model]
         if None in runs_list.keys():
             process_runlist(runs_list[None], images, all_prompts, infotexts)
             runs_list.pop(None)
         if fallback_checkpoint in runs_list.keys():
-            process_runlist(runs_list[fallback_checkpoint], images, all_prompts, infotexts)
+            process_runlist(
+                runs_list[fallback_checkpoint], images, all_prompts, infotexts
+            )
             runs_list.pop(fallback_checkpoint)
         for model in runs_list.keys():
             apply_checkpoint(model)
@@ -161,4 +180,6 @@ class Script(scripts.Script):
         if checkpoint_switched:
             apply_checkpoint(fallback_checkpoint)
 
-        return Processed(p, images, p.seed, "", all_prompts=all_prompts, infotexts=infotexts)
+        return Processed(
+            p, images, p.seed, "", all_prompts=all_prompts, infotexts=infotexts
+        )

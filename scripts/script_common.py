@@ -129,7 +129,7 @@ overrides_mapping = {
     "Override Height": "height",
 }
 possible_overrides = list(overrides_mapping.keys())
-default_overrides = ["Override Model"]
+default_overrides = []
 
 
 def load_prompt_file(file):

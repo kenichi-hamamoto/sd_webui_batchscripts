@@ -103,15 +103,6 @@ class Script(scripts.Script):
                         assert func, f"unknown file setting: {arg}"
                         formated_args[arg] = func(val)
 
-                    if (
-                        (formated_args.get("hr_scale", 0) > 0)
-                        or (formated_args.get("hr_resize_x", 0) > 0)
-                        or (formated_args.get("hr_resize_y", 0) > 0)
-                    ):
-                        formated_args["enable_hr"] = True
-                    else:
-                        formated_args["enable_hr"] = False
-
                     if formated_args.get("face_restoration_model", False):
                         formated_args["restore_faces"] = True
 

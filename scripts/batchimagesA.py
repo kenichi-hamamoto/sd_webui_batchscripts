@@ -142,6 +142,11 @@ class Script(scripts.Script):
                 for k, v in args.items():
                     setattr(copy_p, k, v)
 
+                if append_prompt:
+                    copy_p.prompt += prepend_prompt_text
+                else:
+                    copy_p.prompt = prepend_prompt_text + copy_p.prompt
+
                 copy_p.override_settings = overrides[n]
                 copy_p.override_settings_restore_afterwards = True
                 copy_p.extra_generation_params = {}

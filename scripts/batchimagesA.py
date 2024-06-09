@@ -138,20 +138,19 @@ class Script(scripts.Script):
             for n, args in enumerate(jobs):
                 state.job = f"{state.job_no + 1} out of {state.job_count}"
 
-                copy_p = copy.copy(p)
                 for k, v in args.items():
-                    setattr(copy_p, k, v)
+                    setattr(p, k, v)
 
                 if append_prompt:
-                    copy_p.prompt += prepend_prompt_text
+                    p.prompt += prepend_prompt_text
                 else:
-                    copy_p.prompt = prepend_prompt_text + copy_p.prompt
+                    p.prompt = prepend_prompt_text + p.prompt
 
-                copy_p.override_settings = overrides[n]
-                copy_p.override_settings_restore_afterwards = True
-                copy_p.extra_generation_params = {}
+                p.override_settings = overrides[n]
+                p.override_settings_restore_afterwards = True
+                p.extra_generation_params = {}
 
-                proc = process_images(copy_p)
+                proc = process_images(p)
                 images += proc.images
 
                 all_prompts += proc.all_prompts

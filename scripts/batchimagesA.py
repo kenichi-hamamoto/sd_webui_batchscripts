@@ -146,6 +146,11 @@ class Script(scripts.Script):
                 else:
                     p.prompt = prepend_prompt_text + p.prompt
 
+                # すべてのHires. fix のpromptが最初の1枚目のpromptになっていたので修正（pを引き継ぐことが原因っぽい）
+                # TODO:UI上のHires. fix のprompt入力も無視するので必要なら修正すること
+                p.hr_prompt = ""
+                p.hr_negative_prompt = ""
+
                 p.override_settings = overrides[n]
                 p.override_settings_restore_afterwards = True
                 p.extra_generation_params = {}
